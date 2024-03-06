@@ -2,11 +2,7 @@ use regex::Regex;
 
 // use std::collections::HashMap;
 type HashMap<K, V> = indexmap::IndexMap<K, V, fnv::FnvBuildHasher>;
-pub struct Date {
-    year: u32,
-    month: Option<u32>,
-    day: Option<u32>,
-}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, clap::ValueEnum)]
 pub enum EraFormat {
     // 元号を漢字、1年を元年と表記
@@ -63,11 +59,11 @@ impl EraNames {
 impl From<&str> for EraNames {
     fn from(s: &str) -> Self {
         match s {
-            "明治" | "M" => EraNames::Meiji,
-            "大正" | "T" => EraNames::Taisho,
-            "昭和" | "S" => EraNames::Showa,
-            "平成" | "H" => EraNames::Heisei,
-            "令和" | "R" => EraNames::Reiwa,
+            "明治" | "M" | "m" => EraNames::Meiji,
+            "大正" | "T" | "t" => EraNames::Taisho,
+            "昭和" | "S" | "s" => EraNames::Showa,
+            "平成" | "H" | "h" => EraNames::Heisei,
+            "令和" | "R" | "r" => EraNames::Reiwa,
             _ => panic!("{} is not a valid era name", s),
         }
     }
@@ -117,7 +113,7 @@ pub fn cvt_era_string(era_name: EraNames, era_number: u32, format: EraFormat) ->
     )
 }
 pub fn japanese_to_western(era: impl AsRef<str>) -> Result<u32, String> {
-    let re = Regex::new(r"([明治大正昭和平成令]+|[a-zA-Z]+)(\d+|元)(年*)").unwrap();
+    let re = Regex::new(r"([明治大正昭和平成令]+|[a-zA-Z]+)(\d+|元)(.*)").unwrap();
     let era = era.as_ref().trim();
     if let Some(caps) = re.captures(era) {
         let era = EraNames::from(&caps[1]).into_u32();
@@ -126,8 +122,11 @@ pub fn japanese_to_western(era: impl AsRef<str>) -> Result<u32, String> {
         } else {
             caps[2].parse::<u32>().unwrap()
         };
-
-        Ok(era + year - 1)
+        if !(&caps[1].is_empty()) && &caps[1] != "年" {
+            Err(format!("{} is invalid format.", era))
+        } else {
+            Ok(era + year - 1)
+        }
     } else {
         Err(format!("{} can not convert to Western Calender", era))
     }

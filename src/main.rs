@@ -72,18 +72,22 @@ fn help_display() {
 fn translate_core(s: impl AsRef<str>, mode: EraFormat) -> Result<String, String> {
     let s = s.as_ref().trim();
     let first_char = s.as_bytes()[0];
-    let reg_western_calender = Regex::new(r"(\d+)(年*)").unwrap();
+    let reg_western_calender = Regex::new(r"(\d+)(.*)").unwrap();
     if (48..=57).contains(&first_char) {
         // 西暦を和暦へ変換
         if let Some(caps) = reg_western_calender.captures(s) {
-            if let Ok(y) = &caps[1].parse::<u32>() {
-                let res = western_to_japanese(*y);
-                match res {
-                    Ok((name, year)) => Ok(cvt_era_string(name, year, mode)),
-                    Err(e) => Err(e),
+            if caps[2].is_empty() || &caps[2] == "年" {
+                if let Ok(y) = &caps[1].parse::<u32>() {
+                    let res = western_to_japanese(*y);
+                    match res {
+                        Ok((name, year)) => Ok(cvt_era_string(name, year, mode)),
+                        Err(e) => Err(e),
+                    }
+                } else {
+                    Err(format!("{} can not convert year.", s))
                 }
             } else {
-                Err(format!("{} can not convert year.", s))
+                Err(format!("{} is invalid format.", s))
             }
         } else {
             Err(format!("{} is invalid format.", s))
