@@ -122,8 +122,8 @@ pub fn japanese_to_western(era: impl AsRef<str>) -> Result<u32, String> {
         } else {
             caps[2].parse::<u32>().unwrap()
         };
-        if !(&caps[1].is_empty()) && &caps[1] != "年" {
-            Err(format!("{} is invalid format.", era))
+        if !(&caps[3].is_empty()) && &caps[3] != "年" {
+            Err(format!("{} is invalid format.", dbg!(era)))
         } else {
             Ok(era + year - 1)
         }

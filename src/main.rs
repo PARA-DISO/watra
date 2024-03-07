@@ -71,6 +71,9 @@ fn help_display() {
 }
 fn translate_core(s: impl AsRef<str>, mode: EraFormat) -> Result<String, String> {
     let s = s.as_ref().trim();
+    if s.is_empty() {
+        return Err(String::from(""));
+    }
     let first_char = s.as_bytes()[0];
     let reg_western_calender = Regex::new(r"(\d+)(.*)").unwrap();
     if (48..=57).contains(&first_char) {
@@ -120,7 +123,11 @@ fn main() {
                 Command::ModeChange(m) => mode = m,
                 Command::Convert(s) => match translate_core(s, mode) {
                     Ok(s) => println!("{}", s),
-                    Err(e) => println!("{}", e),
+                    Err(e) => {
+                      if !e.is_empty() {
+                        println!("{}", e)
+                      }
+                    },
                 },
                 Command::None => {}
             }
