@@ -1,6 +1,6 @@
 [package]
 name = "watra"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "CLI application to mutually convert between the Japanese calendar and the Western calendar"
 authors = ["PARADISO <paradiso@ymail.ne.jp>"]
@@ -15,7 +15,7 @@ copyright = "2024, PARADISO <paradiso@ymail.ne.jp>"
 license-file = ["LICENSE", "0"]
 
 [dependencies]
-clap ={version="4.5.1",features=["derive"]}
+clap ={version="4.5.2",features=["derive"]}
 fnv="1.0.7"
 indexmap="2.2.5"
 regex="1.10.3"
